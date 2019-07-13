@@ -1,6 +1,6 @@
 
-if !has('python')
-    echo "Error: Required vim compiled with +python"
+if !has('python3')
+    echo "Error: Required vim compiled with +python3"
     finish
 endif
 com! -nargs=* Instantmd call OpenMarkdown()
@@ -9,7 +9,7 @@ let s:scriptfolder = expand('<sfile>:p:h').'/md_instant'
 
 function! OpenMarkdown()
     let b:md_tick = 0
-python << EOF
+python3 << EOF
 import sys, os, vim, time
 sys.path.append(vim.eval('s:scriptfolder'))
 sys.stdout = open(os.path.devnull, 'w')
@@ -29,13 +29,13 @@ endfunction
 function! UpdateMarkdown()
     if (b:md_tick != b:changedtick)
         let b:md_tick = b:changedtick
-python << EOF
+python3 << EOF
 md_instant.sendall(vim.current.buffer)
 EOF
     endif
 endfunction
 function! CloseMarkdown()
-python << EOF
+python3 << EOF
 md_instant.stopserver()
 EOF
 endfunction

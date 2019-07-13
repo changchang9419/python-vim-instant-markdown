@@ -12,7 +12,6 @@ from markdown import markdown
 
 import ws
 
-markdown_options = ['extra', 'codehilite']
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -23,19 +22,19 @@ class MyHandler(BaseHTTPRequestHandler):
         self.end_headers()
         if self.path == '/':
             f = open(current_dir+'/index.html', 'r')
-            data = f.read()
+            data = f.read().encode('utf-8')
             self.wfile.write(data)
             f.close()
         try:
             f = open(self.path[1:], 'rb')
-            self.wfile.write(f.read())
+            self.wfile.write(f.read().encode('utf-8'))
             f.close()
         except:
             pass
 
 
 def sendall(data):
-    html = markdown('\n'.join(data).decode('utf-8'), markdown_options)
+    html = markdown('\n'.join(data))
     threading.Thread(target=ws.sendall, args=(json.dumps(html),)).start()
 
 

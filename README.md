@@ -1,11 +1,11 @@
 # python-vim-instant-markdown
-fork from isnowfy, updated code and folder structure to support pathogen
+fork from isnowfy, updated code to support python3
 
-thanks for scturtle and his vim-instant-markdown-py project
+thanks for isnowfy and his python-vim-instant-markdown project
 
 ## Requirements
 * python and markdown and pygments package
-* vim should have python support, you can check it `vim --version | grep +python`
+* vim should have python3 support, you can check it `vim --version | grep +python3`
 
 ## Installation
 * `pip install markdown` and `pip install pygments`

@@ -14,17 +14,18 @@ class WebSocket():
         data = conn.recv(8192)
         if not len(data):
             return False
-        for line in data.split('\r\n\r\n')[0].split('\r\n')[1:]:
-            k, v = line.split(': ')
-            if k == 'Sec-WebSocket-Key':
-                key = base64.b64encode(hashlib.sha1(v + '258EAFA5-E914-47DA-95CA-C5AB0DC85B11').digest())
+        for line in data.split(b'\r\n\r\n')[0].split(b'\r\n')[1:]:
+            k, v = line.split(b': ')
+            if k == b'Sec-WebSocket-Key':
+                v += b'258EAFA5-E914-47DA-95CA-C5AB0DC85B11'
+                key = base64.b64encode(hashlib.sha1(v).digest())
         if not key:
             conn.close()
             return False
-        response = 'HTTP/1.1 101 Switching Protocols\r\n'\
-                   'Upgrade: websocket\r\n'\
-                   'Connection: Upgrade\r\n'\
-                   'Sec-WebSocket-Accept:' + key + '\r\n\r\n'
+        response = b'HTTP/1.1 101 Switching Protocols\r\n'\
+                   b'Upgrade: websocket\r\n'\
+                   b'Connection: Upgrade\r\n'\
+                   b'Sec-WebSocket-Accept:' + key + b'\r\n\r\n'
         conn.send(response)
         return True
 
@@ -33,7 +34,7 @@ class WebSocket():
         data = conn.recv(size)
         if not len(data):
             return False
-        length = ord(data[1]) & 127
+        length = data[1] & 127
         if length == 126:
             mask = data[4:8]
             raw = data[8:]
@@ -43,14 +44,14 @@ class WebSocket():
         else:
             mask = data[2:6]
             raw = data[6:]
-        ret = ''
+        ret = b''
         for cnt, d in enumerate(raw):
-            ret += chr(ord(d) ^ ord(mask[cnt%4]))
+            ret += bytes(chr(d ^ mask[cnt%4]), 'utf-8')
         return ret
                       
     @staticmethod
     def send(conn, data):
-        head = '\x81'
+        head = b'\x81'
         if len(data) < 126:
             head += struct.pack('B', len(data))
         elif len(data) <= 0xFFFF:
@@ -63,6 +64,7 @@ server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 socket_list = set()
 
 def sendall(data):
+    data = bytes(data, 'utf-8')
     for sock in socket_list:
         if sock != server:
             WebSocket.send(sock, data)
